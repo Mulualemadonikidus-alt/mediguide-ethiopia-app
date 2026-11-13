@@ -1,0 +1,8 @@
+{
+  "name": "mediguide-ethiopia",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@google/genai": "^1.0.0"
+  }
+}

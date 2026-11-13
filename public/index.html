@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="description" content="MediGuide Ethiopia — Comprehensive directory of specialized hospitals, medical centers, specialists and sub-specialists in Addis Ababa, Ethiopia. AI-powered symptom checker to find the right care."/>
+<meta name="keywords" content="hospitals Addis Ababa, Ethiopia doctors, specialized hospital Ethiopia, Tikur Anbessa, Addis Cardiac, medical directory Ethiopia"/>
+<meta property="og:title" content="MediGuide Ethiopia — Addis Ababa Medical Directory"/>
+<meta property="og:description" content="Find specialized hospitals, doctors and sub-specialists in Addis Ababa. AI symptom checker guides you to the right care."/>
+<meta property="og:type" content="website"/>
+<title>MediGuide Ethiopia — Addis Ababa Specialized Medical Directory</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚕</text></svg>"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a1628;color:#e8f0ff;font-family:'Inter',sans-serif;font-size:14px;line-height:1.5}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:#0a1628}::-webkit-scrollbar-thumb{background:#1e3a6e;border-radius:3px}
+@keyframes pulse{0%,100%{opacity:.3}50%{opacity:1}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.fade{animation:fadeIn .35s ease}
+button{cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+textarea,input{font-family:'Inter',sans-serif}
+a{color:#3b82f6;text-decoration:none}a:hover{text-decoration:underline}
+.nav-btn{border:1px solid #1e3a6e;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;background:transparent;color:#8ea8d0}
+.nav-btn.active,.nav-btn:hover{background:#c8a951;color:#0a0800;border-color:#c8a951}
+.filter-btn{border:1px solid #1e3a6e;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;background:#0f2040;color:#8ea8d0}
+.filter-btn.active,.filter-btn:hover{background:#c8a951;color:#0a0800;border-color:#c8a951}
+.hosp-card{background:#122040;border:1px solid #1e3a6e;border-radius:12px;padding:18px 22px;cursor:pointer;transition:all .2s;margin-bottom:10px}
+.hosp-card:hover,.hosp-card.open{background:#163060;border-color:#c8a951}
+.sub-card{background:#0f2040;border:1px solid #1e3a6e;border-radius:10px;padding:13px 15px}
+.stat-card{background:#0f2040;border:1px solid #1e3a6e;border-radius:10px;padding:14px 16px;text-align:center}
+.quick-card{background:#0f2040;border:1px solid #1e3a6e;border-radius:10px;padding:13px 15px}
+.loc-card{background:#070f1e;border:1px solid #1e3a6e;border-radius:10px;padding:11px 13px;display:flex;gap:11px;align-items:flex-start}
+.badge-pub{background:#1a3a1a;color:#22a65c;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;text-transform:uppercase}
+.badge-priv{background:#1a2a3a;color:#3b82f6;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;text-transform:uppercase}
+.badge-ngo{background:#2a1a3a;color:#c084fc;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;text-transform:uppercase}
+.badge-gold{background:#1e2a0a;color:#c8a951;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px}
+.spec-pill{display:inline-block;background:#0d1e3a;color:#8ea8d0;font-size:10px;padding:2px 7px;border-radius:10px;margin:2px 3px 2px 0;border:1px solid #1e3a6e}
+.sym-area{width:100%;min-height:95px;padding:13px 15px;border-radius:10px;border:1px solid #1e3a6e;background:#070f1e;color:#e8f0ff;font-size:13px;resize:vertical;outline:none;line-height:1.6}
+.sym-area:focus{border-color:#c8a951}
+.search-inp{width:100%;padding:12px 17px;border-radius:10px;border:1px solid #1e3a6e;background:#0f2040;color:#e8f0ff;font-size:13px;outline:none;margin-bottom:12px}
+.search-inp:focus{border-color:#c8a951}
+.ex-btn{background:#0d1e3a;border:1px solid #1e3a6e;color:#8ea8d0;padding:5px 12px;border-radius:18px;font-size:11px}
+.ex-btn:hover{border-color:#c8a951;color:#c8a951}
+.submit-btn{width:100%;padding:12px;border-radius:10px;border:none;font-size:14px;font-weight:800;letter-spacing:.02em}
+.submit-btn.on{background:#c8a951;color:#0a0800;cursor:pointer}
+.submit-btn.off{background:#3a3020;color:#4a6a9a;cursor:not-allowed}
+.reset-btn{background:transparent;border:1px solid #1e3a6e;color:#8ea8d0;padding:9px 22px;border-radius:8px;font-size:13px}
+.rec-card{background:#0f2040;border:1px solid #1e3a6e;border-radius:10px;padding:12px 15px;margin-bottom:8px;display:flex;gap:13px;align-items:flex-start}
+.rec-card.top{border-color:#c8a951}
+.num-circle{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0}
+.urg-emergency{background:#2d0a0a;border:1.5px solid #ff3333;color:#ff4444;border-radius:9px;padding:11px 16px;margin-bottom:14px;font-size:12px;font-weight:700}
+.urg-urgent{background:#2d1a00;border:1.5px solid #ff9900;color:#ff9900;border-radius:9px;padding:11px 16px;margin-bottom:14px;font-size:12px;font-weight:700}
+.urg-routine{background:#0a2d1a;border:1.5px solid #22c55e;color:#22c55e;border-radius:9px;padding:11px 16px;margin-bottom:14px;font-size:12px;font-weight:700}
+.dot1{animation:pulse 1.2s infinite}.dot2{animation:pulse 1.2s .3s infinite}.dot3{animation:pulse 1.2s .6s infinite}
+.disc-section{margin-bottom:22px}
+.disc-title{font-size:14px;font-weight:700;color:#c8a951;margin-bottom:7px}
+.disc-body{font-size:12px;color:#8ea8d0;line-height:1.85}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script>
+const {useState,useRef}=React;
+const E=React.createElement;
+
+const H=[
+{id:1,name:"Tikur Anbessa (Black Lion) Specialized Hospital",am:"ጥቁር አንበሳ ሆስፒታል",type:"Public",est:1964,beds:800,addr:"Arat Kilo, Lideta Sub-City",phone:"+251 11 155 1211",appt:"Walk-in or call +251 11 155 1211",web:"https://aau.edu.et/chs",fb:"",tg:"",coords:"9.0340°N 38.7636°E",badge:"National Referral · Only Radiotherapy in Ethiopia",
+desc:"Ethiopia's largest & most prestigious referral and teaching hospital. Affiliated with Addis Ababa University. The ONLY centre for radiotherapy in Ethiopia. 500,000+ outpatients annually.",
+tags:["cardiology","oncology","neurology","neurosurgery","orthopedics","internal","pediatrics","psychiatry","ophthalmology","surgery","emergency","hematology","pulmonology","endocrinology","renal"],
+specs:[
+{n:"Cardiology & Interventional Cardiology",icon:"♥",subs:["Coronary Angiography & PCI","Echocardiography","Heart Failure Clinic","Electrophysiology","Preventive Cardiology","Valvular Heart Disease"],docs:["Prof. Yewondwossen Tegene (Cardiology)","Dr. Bekele Tesfaye (Interventional)","Dr. Dawit Hailu (Echo)","Dr. Tewodros Gedlu (Heart Failure)"]},
+{n:"Oncology & Radiotherapy (ONLY center in Ethiopia)",icon:"⊕",subs:["Medical Oncology","Radiation Therapy","Pediatric Oncology","Palliative Care","Breast Oncology","Hematologic Malignancies"],docs:["Prof. Abebe Bekele (Surgical Oncology)","Dr. Tigeneh Wondemagegnehu (Radiation)","Dr. Selamawit Girma (Medical Oncology)","Dr. Mathewos Assefa"]},
+{n:"Neurology & Neurosurgery",icon:"⚡",subs:["Epilepsy Clinic","Stroke Unit","Brain Tumor Surgery","Spinal Surgery","Movement Disorders","Neuroinfectious Disease"],docs:["Dr. Redda Tekle-Haimanot (Neurology)","Dr. Mossie Alemu (Neurology)","Dr. Biniyam Yeshitila (Neurosurgery)"]},
+{n:"Orthopedics & Trauma Surgery",icon:"✦",subs:["Joint Replacement","Spine Surgery","Sports Medicine","Pediatric Orthopedics","Trauma & Limb Reconstruction"],docs:["Prof. Zemenfes Tekle","Dr. Biruk Lamessa","Dr. Solomon Tadesse (Spine)"]},
+{n:"Internal Medicine Sub-specialties",icon:"◎",subs:["Gastroenterology","Endocrinology","Nephrology","Pulmonology","Rheumatology","Infectious Disease","Hematology"],docs:["Prof. Fekade Solomon","Dr. Dawit Kebede (Gastro)","Dr. Tigist Haile (Endo)","Dr. Mekonnen Tadesse (Nephro)"]},
+{n:"Pediatrics & Neonatology",icon:"◆",subs:["Pediatric Cardiology","NICU","Pediatric Surgery","Pediatric Neurology","Pediatric Oncology"],docs:["Dr. Biruk Hailu (Ped Cardiology)","Dr. Ashenafi Assefa (Neonatology)"]},
+{n:"General & Sub-specialty Surgery",icon:"✂",subs:["Laparoscopic Surgery","Colorectal","Hepatobiliary","Vascular","Thoracic","Endocrine Surgery"],docs:["Prof. Abebe Bekele","Dr. Kassahun Dires (Laparo)","Dr. Tewodros Wubie"]},
+{n:"Psychiatry & Mental Health",icon:"◈",subs:["Child & Adolescent Psychiatry","Addiction Medicine","Geriatric Psychiatry","Psychosis & Mood Disorders"],docs:["Prof. Atalay Alem","Dr. Girmay Medhin"]},
+{n:"Ophthalmology",icon:"◉",subs:["Retina & Vitreous","Glaucoma","Cornea & Anterior Segment","Cataract","Oculoplastics"],docs:["Dr. Tilahun Kiros","Dr. Abebe Bejiga"]},
+{n:"Radiology & Nuclear Medicine",icon:"◌",subs:["MRI","CT Scan","Interventional Radiology","Nuclear Medicine / PET","Mammography"],docs:["Dr. Dawit Negash","Dr. Mahlet Tesfaye (Interventional)"]},
+{n:"Emergency Medicine & Critical Care",icon:"⚠",subs:["Trauma Resuscitation","Medical ICU","Surgical ICU","Toxicology","Pediatric Emergency"],docs:["24/7 Emergency team"]}
+]},
+{id:2,name:"Yekatit 12 Hospital Medical College",am:"የካቲት 12 ሆስፒታል ሕክምና ኮሌጅ",type:"Public",est:1923,beds:456,addr:"Arada Sub-City, Addis Ababa",phone:"+251 11 155 3065",appt:"Walk-in OPD · call +251 11 155 3065",web:"https://y12hmc.org.et",fb:"https://facebook.com/p/Yekatit-12-Hospital-Medical-College-100063650457050",tg:"",coords:"9.0427°N 38.7603°E",badge:"Est.1923 · Ethiopia's First Burn Center · Only Speech Therapy",
+desc:"One of Ethiopia's oldest hospitals (1923). Pioneer: Ethiopia's first burn center and the ONLY hospital with Speech Therapy in the country. Introduced X-ray to Ethiopia. MSc in Healthcare Quality. 1 million+ patients/year.",
+tags:["burns","gynecology","neurosurgery","surgery","cardiology","internal","ent","dental"],
+specs:[
+{n:"Burns & Reconstructive Surgery (Pioneer Center)",icon:"✦",subs:["Burn ICU (first in Ethiopia)","Skin Grafting","Reconstructive Surgery","Wound Care","Scar & Contracture Management"],docs:["Dr. Elias Tewabe (Provost & Burns Specialist)","Dr. Anteneh Mitiku (Medical Services VP)"]},
+{n:"General Surgery & Neurosurgery",icon:"✂",subs:["General Surgery","Neurosurgery","Laparoscopic Procedures","Head & Neck Surgery"],docs:["Dr. Mereretu Temesgen","Dr. Anteneh Mitiku"]},
+{n:"Obstetrics & Gynecology",icon:"◆",subs:["High-Risk Obstetrics","Gynecologic Surgery","Family Planning","Colposcopy"],docs:["Dr. Ananya Solomon Abebech (OB/GYN Director)"]},
+{n:"ENT, Dentistry & Speech Therapy (UNIQUE)",icon:"◉",subs:["Otolaryngology","Dental Surgery","Speech & Language Therapy (ONLY in Ethiopia)","Audiology"],docs:["Specialist consultants — call hospital"]},
+{n:"Radiology (First X-ray in Ethiopia)",icon:"◌",subs:["X-Ray (pioneered in Ethiopia)","Ultrasound","CT Scan","Digital Radiology"],docs:["Radiology team — contact hospital"]}
+]},
+{id:3,name:"Menelik II Referral Hospital",am:"ምኒልክ II ሪፈራል ሆስፒታል",type:"Public",est:1909,beds:800,addr:"Menelik II Ave, Jan Meda, Addis Ababa",phone:"+251 11 155 0444",appt:"Walk-in · alt: +251 11 123 4272",web:"",fb:"",tg:"",coords:"9.0235°N 38.7415°E",badge:"Est.1909 · 15,000 Patients/Day · New Dialysis Center",
+desc:"One of Ethiopia's oldest and largest hospitals (1909). Serves 15,000+ patients daily with 2,300+ staff. Major public tertiary referral center with a recently opened Dialysis Center.",
+tags:["cardiology","neurology","internal","obstetrics","gynecology","pediatrics","surgery","orthopedics","renal","dialysis","emergency"],
+specs:[
+{n:"Internal Medicine, Cardiology & Nephrology",icon:"◎",subs:["Cardiology","Gastroenterology","Nephrology & Dialysis (new center)","Endocrinology","Hematology","Pulmonology"],docs:["Specialist physicians — call +251 11 155 0444"]},
+{n:"Surgery, OB/GYN & Emergency",icon:"✂",subs:["General Surgery","Laparoscopic Surgery","Caesarean Section","High-Risk Obstetrics","Gynecologic Surgery","Emergency Medicine","Pediatrics","NICU","Neurology"],docs:["24/7 emergency & specialist teams"]}
+]},
+{id:4,name:"St. Paul's Comprehensive Specialized Hospital",am:"ቅዱስ ጳውሎስ ሕክምና ኮሌጅ",type:"Public",est:1969,beds:700,addr:"Gulele Sub-City, Addis Ababa",phone:"+251 11 127 5064",appt:"Walk-in OPD · call +251 11 127 5064",web:"https://sphmmc.edu.et",fb:"",tg:"",coords:"9.0503°N 38.7275°E",badge:"Millennium Medical College · Cardiac Surgery Center",
+desc:"Second largest hospital in Ethiopia. Combined with St. Paul's Hospital Millennium Medical College. Renowned for cardiac surgery, maternal-fetal medicine, and complex urology.",
+tags:["cardiology","cardiac surgery","obstetrics","gynecology","surgery","pediatrics","urology","ent","dermatology","internal"],
+specs:[
+{n:"Cardiology & Cardiac Surgery",icon:"♥",subs:["Open Heart Surgery","CABG","Congenital Heart Disease","Valvular Heart Disease","Cardiac Catheterization","Aortic Surgery"],docs:["Dr. Hailu Merga (Cardiac Surgery)","Dr. Liya Tessema (Cardiology)","Dr. Robel Tesfaye (Interventional)"]},
+{n:"Obstetrics & Gynecology",icon:"◆",subs:["Maternal-Fetal Medicine","Gynecologic Oncology","Urogynecology","High-Risk Pregnancy","Fetal Diagnosis"],docs:["Prof. Tamiru Desta","Dr. Zewdie Muleta (Fistula/Urogyn)","Dr. Hanna Girma (MFM)"]},
+{n:"Surgery, Urology & ENT",icon:"✂",subs:["Trauma & Thoracic Surgery","Laparoscopic Surgery","Pediatric Surgery","Endourology","TURP","Otology","Head & Neck Surgery","Cochlear Implant"],docs:["Dr. Tewodros Wubie (Surgery)","Dr. Gebremedhin Alemayehu (Urology)","Dr. Biruk Haile (ENT)"]},
+{n:"Dermatology & Neurology",icon:"◈",subs:["Leprosy Referral","Tropical Skin Diseases","Pigmentary Disorders","Neurology","Stroke Unit"],docs:["Dr. Tigist Worku (Dermatology)","Dr. Almaz Kebede (Dermatology)"]}
+]},
+{id:5,name:"ALERT Comprehensive Specialized Hospital",am:"አለርት ሆስፒታል",type:"Public",est:1968,beds:400,addr:"Kolfe Keranyo Sub-City, Addis Ababa",phone:"+251 11 127 5100",appt:"Walk-in · call +251 11 127 5100",web:"",fb:"",tg:"",coords:"9.0181°N 38.7159°E",badge:"WHO Collaborating Centre · Leprosy & Plastic Surgery",
+desc:"WHO Collaborating Centre for International Leprosy Training. National referral for plastic & reconstructive surgery, dermatology, tropical skin diseases, and HIV/AIDS care.",
+tags:["plastic surgery","dermatology","neurosurgery","ophthalmology","infectious","hiv","tb","leprosy","reconstructive","burns"],
+specs:[
+{n:"Plastic & Reconstructive Surgery",icon:"✦",subs:["Hand Surgery & Microsurgery","Burns Management","Cleft Lip & Palate","Keloid Treatment","Wound Reconstruction","Leprosy Reconstruction"],docs:["Dr. Dawit Bekele","Dr. Hanna Tesfaye","Dr. Seifu Girma"]},
+{n:"Dermatology, Venereology & HIV/AIDS",icon:"◈",subs:["Leprosy Management & MDT","Tropical Skin Diseases","STI Management","HIV-related Dermatology","Cutaneous TB","ART Management","MDR-TB","PrEP Clinic"],docs:["Dr. Meseret Shiferaw (Dermatology)","Dr. Tigist Feleke (HIV/AIDS)"]},
+{n:"Neurosurgery & Ophthalmology",icon:"⚡",subs:["Trauma Neurosurgery","Peripheral Nerve Surgery","Spinal Cord Injury","Cataract Surgery","Trachoma","Leprosy Eye Care"],docs:["Dr. Abebe Admasu (Neurosurgery)","Dr. Demis Hailu (Ophthalmology)"]}
+]},
+{id:6,name:"Amanuel Mental Health Specialized Hospital",am:"አማኑኤል ሆስፒታል",type:"Public",est:1930,beds:380,addr:"Gulele Sub-City, Addis Ababa",phone:"+251 11 127 5770",appt:"Referral or walk-in · call +251 11 127 5770",web:"",fb:"",tg:"",coords:"9.0520°N 38.7310°E",badge:"Ethiopia's ONLY Dedicated Psychiatric Hospital",
+desc:"The ONLY dedicated mental health specialized hospital in Ethiopia. Inpatient, outpatient, and community mental health services. Collaborates with WHO on mental health research.",
+tags:["psychiatry","mental health","addiction","child psychiatry","forensic"],
+specs:[
+{n:"Adult & Child Psychiatry",icon:"◈",subs:["Schizophrenia","Bipolar Disorder","Major Depression","Psychosis","Autism & ADHD","Childhood Psychosis","Behavioral Disorders"],docs:["Prof. Atalay Alem","Dr. Dawit Wondimagegnehu","Dr. Girmay Medhin","Dr. Mulugeta Demissie (Child)"]},
+{n:"Addiction Medicine & Forensic Psychiatry",icon:"◎",subs:["Alcohol & Khat Addiction","Substance Detox","Dual Diagnosis","Relapse Prevention","Forensic Assessment","Community Outreach"],docs:["Dr. Solomon Teferra (Addiction)","Forensic team"]}
+]},
+{id:7,name:"Hamlin Fistula Hospital",am:"ሃምሊን ፊስቱላ ሆስፒታል",type:"NGO",est:1974,beds:120,addr:"Kolfe-Keranyo Sub-City, Addis Ababa",phone:"+251 11 371 6544",appt:"ALL CARE IS FREE — enquiries@hamlinfistula.org | +251 11 371 6544",web:"https://hamlinfistula.org",fb:"",tg:"",coords:"9.0052°N 38.7153°E",badge:"World Leader in Fistula Repair · ALL CARE IS FREE",
+desc:"World's premier fistula hospital. Founded 1974 by Dr. Catherine & Dr. Reginald Hamlin. FREE surgical repair for women with obstetric fistula. 93% success rate. Over 55,000 women treated. 100% Ethiopian governance.",
+tags:["obstetrics","fistula","urogynecology","women","reconstructive","rehabilitation"],
+specs:[
+{n:"Obstetric Fistula Repair — ALL FREE",icon:"◆",subs:["Vesicovaginal Fistula (VVF) Repair","Rectovaginal Fistula Repair","Complex Fistula Reconstruction","Urinary Incontinence Surgery","Urethroplasty"],docs:["Dr. Fekade Tsige (Fistula Surgery)","Ethiopian surgical team trained by Dr. Hamlin"]},
+{n:"Rehabilitation & Reintegration",icon:"◎",subs:["Physiotherapy","Psychological Counseling","Literacy & Vocational Training","Nutritional Rehabilitation","Midwifery Training","Desta Mender Reintegration"],docs:["Multidisciplinary care team"]}
+]},
+{id:8,name:"St. Peter Referral Hospital",am:"ቅዱስ ጴጥሮስ ሆስፒታል",type:"Public",est:1956,beds:300,addr:"Entoto Area, Gulele Sub-City, Addis Ababa",phone:"+251 11 127 6264",appt:"Walk-in · call +251 11 127 6264",web:"",fb:"",tg:"",coords:"9.0781°N 38.7581°E",badge:"National TB & Thoracic Disease Referral Center",
+desc:"Ethiopia's national referral hospital for tuberculosis and thoracic disease. Houses the national TB program with MDR-TB and XDR-TB management. General specialist services alongside TB care.",
+tags:["pulmonology","tb","tuberculosis","thoracic","surgery","internal","infectious"],
+specs:[
+{n:"Pulmonology & Tuberculosis (National Referral)",icon:"◎",subs:["Drug-Sensitive TB","MDR-TB Management","XDR-TB Management","Pulmonary Fibrosis","COPD","Asthma","Bronchiectasis"],docs:["Dr. Zelalem Temesgen (TB/Pulmonology)","Dr. Biruk Tadesse (Pulmonology)"]},
+{n:"Thoracic Surgery & HIV-TB",icon:"✂",subs:["Thoracotomy","Pleural Decortication","Lung Resection","VATS","Empyema Drainage","HIV-TB Co-infection","ART Management"],docs:["Thoracic surgery team — call hospital"]}
+]},
+{id:9,name:"Addis Cardiac Hospital",am:"አዲስ ካርዲያክ ሆስፒታል",type:"Private",est:2008,beds:80,addr:"Kazanchis, Addis Ababa",phone:"+251 11 660 0808 / +251 911 243274",appt:"Call +251 11 660 0808 or +251 911 243274",web:"",fb:"",tg:"",coords:"9.0143°N 38.7614°E",badge:"Ethiopia's ONLY Dedicated Heart Hospital",
+desc:"Ethiopia's first and ONLY dedicated cardiovascular hospital. Premier destination for all cardiac conditions — diagnosis, intervention, surgery, electrophysiology, and cardiac rehabilitation.",
+tags:["cardiology","cardiac surgery","interventional","electrophysiology","imaging","rehabilitation"],
+specs:[
+{n:"Interventional Cardiology",icon:"♥",subs:["Coronary Angiography & PCI","Peripheral Vascular Intervention","Structural Heart Disease (TAVI/TAVR)","Balloon Valvuloplasty","Septal Defect Closure"],docs:["Dr. Fasil Tekle (Interventional)","Dr. Melaku Wolde (Interventional)","Dr. Behailu Mekuriaw (EP)"]},
+{n:"Cardiac Surgery",icon:"✂",subs:["CABG (On-pump & Off-pump)","Valve Repair & Replacement","Congenital Heart Surgery","Aortic Surgery"],docs:["Dr. Tewodros Yohannes (Cardiac Surgery)","Dr. Solomon Belachew (Cardiac Surgery)"]},
+{n:"Electrophysiology, Imaging & Rehabilitation",icon:"⚡",subs:["EP Studies & Ablation","Pacemaker & ICD Implantation","CRT Devices","Echocardiography (2D/3D/TEE)","Cardiac MRI","Cardiac CT Angiography","Nuclear Cardiology","Lipid & Prevention Clinic","Post-MI Cardiac Rehab"],docs:["Dr. Behailu Mekuriaw (EP)","Dr. Amanuel Bekele (Imaging)","Dr. Sara Girma (Prevention)"]}
+]},
+{id:10,name:"MCM Comprehensive Specialized Hospital (Korean Hospital)",am:"ምዩንግሱንግ ክርስቲያን ሕክምና ማዕከል",type:"Private",est:2004,beds:248,addr:"Bole Sub-City Woreda 14, Addis Ababa",phone:"+251 11 629 2963 / +251 11 629 5421",appt:"Call +251 11 629 2963 | msmcmet@gmail.com",web:"https://mcmkoreanhospital.org",fb:"https://facebook.com/MMCmedcollege",tg:"",coords:"9.0082°N 38.8252°E",badge:"Largest Private Teaching Hospital · International Staff",
+desc:"Largest private teaching hospital in Ethiopia (founded 2004, Myungsung Presbyterian Church, South Korea). American, Korean & Norwegian specialist staff. First private institution promoted to Comprehensive Specialized Hospital status in Ethiopia.",
+tags:["surgery","pediatrics","obstetrics","gynecology","internal","ophthalmology","dental","ent","psychiatry","renal","nephrology","hemodialysis","gastroenterology"],
+specs:[
+{n:"Surgery (General, Laparoscopic & Minimally Invasive)",icon:"✂",subs:["General Surgery","Laparoscopic Surgery","Minimally Invasive Surgery (new 2025)","Pediatric Surgery","Orthopedic Surgery","Plastic & Reconstructive","Neurosurgery"],docs:["Dr. Roger Holland (Surgery & Medical School Dean)","American Surgeon team","Dr. Einer (Plastic/Burn Surgery)"]},
+{n:"Pediatrics, Neonatology & OB/GYN",icon:"◆",subs:["Pediatric Medicine","Neonatology & NICU","Pediatric Surgery","Developmental Pediatrics","Normal & High-Risk Delivery","Gynecologic Surgery"],docs:["Canadian Pediatric Surgeon","American Family Physician","OB/GYN specialist team"]},
+{n:"Internal Medicine, Gastroenterology & Nephrology",icon:"◎",subs:["Cardiology","Gastroenterology","Nephrology & Hemodialysis","Endocrinology","Hematology","Infectious Disease"],docs:["Dr. Jikssa (Gastroenterology — President, Ethiopian Gastroenterology Assoc.)","Korean Nephrologist","Korean Radiologist"]},
+{n:"Ophthalmology, ENT, Dental, Psychiatry & Radiology",icon:"◉",subs:["Cataract Surgery","Eye Institute (CBM partnership)","ENT Surgery","Audiology","Oral Surgery","Dental Implants","Prosthodontics","Psychiatry","CT & MRI Radiology","Pathology"],docs:["Korean Ophthalmologist","Korean Dentist","Ethiopian ENT & Psychiatry specialists"]}
+]},
+{id:11,name:"Bethzatha General Hospital",am:"ቤተዛታ ጠቅላላ ሆስፒታል",type:"Private",est:1996,beds:60,addr:"Near Addis Ababa Stadium, Kirkos Sub-City",phone:"+251 11 551 4141 / +251 11 551 9640",appt:"24/7 ambulance · call +251 11 551 4141",web:"https://bethzatha.com",fb:"https://facebook.com/betezata",tg:"",coords:"9.0129°N 38.7518°E",badge:"Est.1996 · 4 Lab Centers · Chemotherapy",
+desc:"Established 1996. 100,000+ patients/year across 4 laboratory centers in Addis Ababa. Oncology (chemotherapy), Internal Medicine, Spine Surgery, advanced EMR-based diagnostics. 24/7 ambulance service.",
+tags:["internal","surgery","oncology","spine","orthopedics","gynecology","pediatrics","laboratory","emergency"],
+specs:[
+{n:"Oncology, Chemotherapy & Internal Medicine",icon:"⊕",subs:["Medical Oncology","Chemotherapy Administration","Tumor Board","Hematologic Malignancies","Cardiology","Gastroenterology","Endocrinology","Rheumatology"],docs:["Dr. Robel Tadesse (Internal Medicine)","Oncology specialist team — contact hospital"]},
+{n:"Surgery, Spine, OB/GYN & Advanced Lab",icon:"✂",subs:["General Surgery","Spine Surgery","Laparoscopic Surgery","Obstetrics","Gynecologic Surgery","Pediatrics","Clinical Chemistry","Pathology","Molecular Diagnostics"],docs:["Surgical & OB/GYN teams","4 laboratory centers across Addis Ababa"]}
+]},
+{id:12,name:"Ethio Tebib General Hospital",am:"ኢትዮ ጤቢብ ሆስፒታል",type:"Private",est:2010,beds:150,addr:"Near Addis Ababa Stadium, Kirkos Sub-City",phone:"+251 11 618 7345",appt:"Call +251 11 618 7345 | ethiotebibhospital.com",web:"https://ethiotebibhospital.com",fb:"",tg:"",coords:"9.0105°N 38.7905°E",badge:"Advanced Sub-Specialty · 10 Operating Theaters",
+desc:"Modern hospital with 150 beds and 10 operating theaters. Interventional cardiology, laparoscopic GI surgery, endourology, ESWL lithotripsy, ART/VCT services, and full medical/surgical sub-specialties.",
+tags:["cardiology","gastroenterology","nephrology","urology","oncology","internal","surgery","ent","ophthalmology","pulmonology","endocrinology","hiv"],
+specs:[
+{n:"Interventional Cardiology",icon:"♥",subs:["Coronary Angiography","Stent Implantation","Echocardiography","Heart Failure Clinic","Holter Monitoring"],docs:["Dr. Haile Gebrekidan (Cardiology)","Dr. Tigist Assefa (Cardiology)"]},
+{n:"Gastroenterology, Hepatology & GI Surgery",icon:"◎",subs:["Upper & Lower Endoscopy","ERCP","Chronic Liver Disease","Laparoscopic GI Surgery","Pancreatic Disease"],docs:["Dr. Melkam Alemu (Gastro)","Dr. Yonas Mekonnen (Hepato)","Dr. Selamawit Haile (GI Surgery)"]},
+{n:"Nephrology, Urology & Oncology",icon:"✦",subs:["Hemodialysis","ESWL Lithotripsy","Endourology","Prostate Surgery","Medical Oncology","Chemotherapy","ART/VCT HIV","Endocrinology","Pulmonology"],docs:["Dr. Biruk Hailu (Nephrology)","Dr. Getachew Dereje (Urology)","Dr. Elias Tesfaye (Oncology)"]}
+]},
+{id:13,name:"Hayat Hospital & Medical College",am:"ሃያት ሆስፒታል",type:"Private",est:2005,beds:200,addr:"Bole Road, Bole Sub-City, Addis Ababa",phone:"+251 11 157 5757 / +251 11 661 4250",appt:"Call +251 11 157 5757 | hayatmcollege.com",web:"https://hayatmcollege.com",fb:"",tg:"",coords:"9.0081°N 38.7815°E",badge:"Private Teaching Hospital · Neurosurgery & Gastro Excellence",
+desc:"Leading private teaching hospital and medical college. Renowned for neurosurgery, gastroenterology (Dr. Jikssa — first EGA President from a private hospital), orthopedics, and advanced pediatric services.",
+tags:["neurosurgery","gastroenterology","orthopedics","dentistry","pediatrics","dermatology","obstetrics","surgery"],
+specs:[
+{n:"Neurosurgery",icon:"⚡",subs:["Brain Surgery","Spinal Surgery","Neuro-oncology","Peripheral Nerve Surgery","Endoscopic Neurosurgery","Cranial Trauma"],docs:["Dr. Belay Abebe (Neurosurgery)","Dr. Yonas Tesfaye (Neurosurgery)","Dr. Ermias Bekele (Spine)"]},
+{n:"Gastroenterology, Hepatology & Orthopedics",icon:"◎",subs:["Diagnostic & Therapeutic Endoscopy","ERCP","Hepatology","IBD","Hip & Knee Replacement","Spine Surgery","Sports Medicine & Arthroscopy"],docs:["Dr. Tigist Haile (Gastro)","Dr. Robel Mekonnen (Gastro)","Dr. Solomon Girma (Ortho)"]},
+{n:"Dentistry, Pediatrics & Dermatology",icon:"◉",subs:["Oral & Maxillofacial Surgery","Dental Implants","Orthodontics","Pediatric Dentistry","NICU","Pediatric Cardiology","Pediatric Neurology","Medical Dermatology","Laser Therapy"],docs:["Dr. Alemu Tegene (Oral Surgery)","Dr. Selamawit Wubie (Neonatology)","Dr. Tsion Getachew (Dermatology)"]}
+]},
+{id:14,name:"St. Gabriel General Hospital",am:"ቅዱስ ገብርኤል ሆስፒታል",type:"Private",est:1996,beds:100,addr:"Bole Sub-City, Arbeynoch Street, Addis Ababa",phone:"+251 11 156 5045",appt:"24/7 — call +251 11 156 5045",web:"",fb:"",tg:"",coords:"9.0048°N 38.7919°E",badge:"Ethiopia's First Private Hospital (1996) · 24/7",
+desc:"Pioneer of private hospital care in Ethiopia (1996). 24/7 quality services. 36,000+ outpatients, 3,600+ inpatients, 21,000+ lab/radiology services annually. Surgery, neurology, and OB/GYN center of excellence.",
+tags:["surgery","neurology","orthopedics","dermatology","ophthalmology","obstetrics","gynecology","emergency"],
+specs:[
+{n:"Surgery, Neurology & Orthopedics",icon:"✂",subs:["Laparoscopic Surgery","Hernia Repair","Thyroid Surgery","Stroke Management","Epilepsy Clinic","Headache & Migraine","Fracture Management","Joint Replacement","Spine Clinic"],docs:["Dr. Seifu Bekele (Surgery)","Dr. Mekdes Feleke (Neurology)","Dr. Temesgen Habtewold (Ortho)"]},
+{n:"Dermatology, Ophthalmology & OB/GYN",icon:"◈",subs:["Cosmetic Dermatology","Skin Cancer","Eczema & Psoriasis","Vitiligo","Cataract Surgery","LASIK","Glaucoma","High-Risk Pregnancy","Laparoscopic Gynecology","Family Planning"],docs:["Dr. Hana Bekele (Dermatology)","Dr. Taddese Alemu (Ophthalmology)","Dr. Meseret Wolde (OB/GYN)"]}
+]},
+{id:15,name:"American Medical Center (AMC)",am:"አሜሪካን ሜዲካል ሴንተር",type:"Private",est:2012,beds:60,addr:"Sunshine Real Estate, CMC Area, Addis Ababa",phone:"+251 116 678004 / +251 949 648401",appt:"Call +251 116 678004 | Telemedicine: amcethiopia.com",web:"https://amcethiopia.com",fb:"",tg:"",coords:"9.0265°N 38.8115°E",badge:"Western-Standard · Waterbirth · Telemedicine · Travel Medicine",
+desc:"Western-standard, patient-centered care (founded by Dr. Akeza Teame). Unique services: waterbirth & epidural analgesia. 24/7 emergency. Travel medicine. International patient focus. Telemedicine consultations available.",
+tags:["emergency","family medicine","obstetrics","gynecology","pediatrics","internal","travel medicine","telemedicine"],
+specs:[
+{n:"Family, Emergency & Travel Medicine",icon:"⊕",subs:["24/7 Emergency Care","Travel Medicine & Vaccination","Preventive Health Screenings","Chronic Disease Management","Telemedicine","Home Visits"],docs:["Dr. Akeza Teame (Founder, Family Medicine)","Dr. Melat Abate (Co-founder)","Dr. Yohannes Haile (Internal Med)"]},
+{n:"Obstetrics, Gynecology & Pediatrics",icon:"◆",subs:["Waterbirth (unique in Ethiopia)","High-Risk Pregnancy","Epidural Analgesia","C-Section","Gynecologic Ultrasound","NICU","Developmental Pediatrics","Vaccination Programs"],docs:["Dr. Hiwot Girma (OB/GYN)","Dr. Mahlet Bekele (OB/GYN)","Dr. Tafesse Alemu (Pediatrics)"]}
+]},
+{id:16,name:"Anania Mothers & Children Specialized Center",am:"አናኒያ ሆስፒታል",type:"Private",est:1996,beds:57,addr:"Arbeynoch Street, Addis Ababa",phone:"+251 116 624488 / +251 909 464646",appt:"Call +251 116 624488 or +251 909 464646",web:"",fb:"",tg:"",coords:"9.0410°N 38.7477°E",badge:"Dedicated Women & Children · IVF & Infertility",
+desc:"Leading dedicated center for women's health and pediatric care since 1996. Obstetrics, gynecology (including IVF/infertility), neonatal, and pediatric services. Level III NICU.",
+tags:["obstetrics","gynecology","pediatrics","neonatology","fertility","maternal","infertility","ivf"],
+specs:[
+{n:"Obstetrics & Gynecology (incl. IVF)",icon:"◆",subs:["Normal & High-Risk Delivery","Prenatal Screening","Postpartum Care","Fetal Medicine","Infertility Evaluation & IVF","Menopause Management","PCOS","Gynecologic Oncology","Minimally Invasive Gynecology"],docs:["Dr. Martha Tesfaye (OB)","Dr. Tsige Hailu (MFM & IVF)","Dr. Hiwot Bekele (Gynecology)","Dr. Almaz Wolde (OB)"]},
+{n:"Pediatrics, Neonatology & Level III NICU",icon:"◎",subs:["Level III NICU","Well-Baby Clinic","Pediatric Surgery","Developmental Assessment","Pediatric Nutrition","Vaccinations"],docs:["Dr. Tsega Bekele (Neonatology)","Dr. Wondwosen Girma (Pediatrics)"]}
+]},
+{id:17,name:"Santé Medical Center",am:"ሳንቴ ሜዲካል ሴንተር",type:"Private",est:2000,beds:80,addr:"Arat Kilo, Addis Ababa",phone:"+251 11 157 0404",appt:"Call +251 11 157 0404",web:"",fb:"",tg:"",coords:"9.0390°N 38.7621°E",badge:"National Renal & Urology Centre of Excellence",
+desc:"Nationally renowned for renal medicine, dialysis, urological procedures, and world-class laboratory diagnostics. Ethiopia's leading centre for chronic kidney disease management.",
+tags:["nephrology","urology","internal","laboratory","dialysis","renal","endourology","kidney"],
+specs:[
+{n:"Nephrology & Dialysis",icon:"✦",subs:["Hemodialysis (long-term & acute)","Peritoneal Dialysis","Chronic Kidney Disease","Glomerulonephritis","Hypertensive Nephropathy","Renal Transplant Evaluation"],docs:["Dr. Getnet Bekele (Nephrology)","Dr. Meseret Desta (Nephrology)"]},
+{n:"Urology & Internal Medicine",icon:"✦",subs:["Endourology","TURP (Prostate)","Laser & ESWL Lithotripsy","Urologic Oncology","Reconstructive Urology","Urodynamics","Hypertension & Metabolic Clinic","Diabetes & CKD Combi-Clinic"],docs:["Dr. Zelalem Abebe (Urology)","Dr. Henok Yimer (Urology & Internal Med)","Dr. Mekdes Assefa (Lab Medicine)"]}
+]},
+{id:18,name:"Addis Hiwot General Hospital",am:"አዲስ ሕይወት ሆስፒታል",type:"Private",est:2015,beds:200,addr:"Yeka Sub-City, Addis Ababa",phone:"+251 116 678000 / +251 11 618 0449",appt:"Call +251 116 678000 | addishiwotgeneralhospital.com",web:"https://addishiwotgeneralhospital.com",fb:"",tg:"",coords:"9.0490°N 38.8050°E",badge:"70+ Specialist Physicians · Specialized ICUs",
+desc:"Modern private hospital with 400+ staff and 70+ specialist physicians. Specialized ICUs, modern surgical theaters, full multi-specialty coverage including hematology and sickle cell program.",
+tags:["cardiology","neurology","orthopedics","oncology","hematology","surgery","internal","gynecology","icu","pulmonology"],
+specs:[
+{n:"Cardiology & Neurology",icon:"♥",subs:["Echocardiography","Stress Testing","Arrhythmia Management","Heart Failure Clinic","Stroke Unit","Epilepsy","Movement Disorders","Neuro-rehabilitation"],docs:["Dr. Belay Tessema (Cardiology)","Dr. Yemisrach Alemu (Cardiology)","Dr. Fikiru Bekele (Neurology)","Dr. Mekdes Haile (Neurology)"]},
+{n:"Orthopedics, Surgery & OB/GYN",icon:"✦",subs:["Fracture Management","Arthroplasty","Spine Surgery","General Surgery","Laparoscopic Surgery","Obstetrics","Gynecologic Surgery"],docs:["Dr. Ashenafi Habtewold (Ortho)","Dr. Tigist Bekele (Ortho)"]},
+{n:"Oncology & Hematology",icon:"⊕",subs:["Chemotherapy","Tumor Board","Palliative Care","Sickle Cell Disease","Thalassemia","Lymphoma","Coagulation Disorders","Bone Marrow Disease"],docs:["Dr. Muluwork Getachew (Oncology)","Dr. Tigist Hailu (Hematology)","Dr. Yohannes Bekele (Hematology)"]}
+]},
+{id:19,name:"Kadisco General Hospital",am:"ካዲስኮ ሆስፒታል",type:"Private",est:2007,beds:100,addr:"Gerji Area, Bole Sub-City, Addis Ababa",phone:"+251 11 629 8902 / +251 929 105 653",appt:"Call +251 11 629 8902",web:"http://kadcogroup.com",fb:"",tg:"",coords:"9.0190°N 38.8010°E",badge:"Advanced Diagnostics & Surgery · Kadisco Group",
+desc:"Modern preventive and diagnostic hospital (Kadisco Group, 2007). Comprehensive preventive care, advanced imaging, and surgical services across surgery, urology, dermatology, orthopedics, dentistry, and physiotherapy.",
+tags:["surgery","urology","orthopedics","dermatology","dentistry","internal","preventive","radiology","physiotherapy"],
+specs:[
+{n:"Surgery, Orthopedics & Urology",icon:"✂",subs:["General Surgery","Laparoscopic Cholecystectomy","Hernia & Colorectal Surgery","Thyroidectomy","Hip & Knee Arthroplasty","Arthroscopy","Spine Care","Prostate Surgery","Kidney Stone Management","Urodynamics"],docs:["Dr. Ermias Tesfaye (Surgery)","Dr. Naod Bekele (Ortho)","Dr. Tewodros Haile (Urology)"]},
+{n:"Dermatology, Dentistry & Physiotherapy",icon:"◈",subs:["Acne & Hyperpigmentation","Cosmetic Dermatology","Hair Loss Clinic","Restorative Dentistry","Oral Surgery","Orthodontics","Implantology","Physiotherapy","Rehabilitation"],docs:["Dr. Meseret Girma (Dermatology)","Dr. Hana Tesfaye (Dentistry)"]}
+]}
+];
+
+const SYMP={
+cardiology:{kw:["chest pain","chest pressure","heart attack","palpitation","palpitations","irregular heartbeat","shortness of breath","dyspnea","angina","heart failure","edema","swollen legs","hypertension","high blood pressure","tachycardia","arrhythmia","afib","syncope","fainting","rapid heart","chest tightness"],sp:"Cardiology / Cardiac Surgery",urg:"urgent",hosp:[9,1,4,12,18]},
+neurology:{kw:["stroke","weakness","numbness","tingling","paralysis","seizure","epilepsy","headache","migraine","dizziness","vertigo","tremor","parkinson","dementia","memory loss","confusion","slurred speech","facial droop","balance problems","neuropathy","nerve pain","loss of consciousness"],sp:"Neurology / Neurosurgery",urg:"urgent",hosp:[1,14,18,13]},
+neurosurgery:{kw:["brain tumor","spinal cord","disc herniation","spinal stenosis","brain surgery","aneurysm","subdural","spinal injury","head injury","herniated disc"],sp:"Neurosurgery",urg:"urgent",hosp:[1,13,5,14]},
+oncology:{kw:["cancer","tumor","mass","lump","lymphoma","leukemia","chemotherapy","biopsy","malignancy","carcinoma","sarcoma","metastasis","radiation","oncology"],sp:"Oncology",urg:"urgent",hosp:[1,12,18,11]},
+orthopedics:{kw:["bone","fracture","broken","joint pain","knee pain","hip pain","shoulder pain","back pain","arthritis","sport injury","ligament","tendon","orthopedic","musculoskeletal","scoliosis","disc problem"],sp:"Orthopedics & Trauma",urg:"routine",hosp:[1,4,13,14,19,18]},
+obstetrics:{kw:["pregnant","pregnancy","delivery","labor","antenatal","prenatal","miscarriage","c-section","caesarean","postnatal","postpartum","fetal","newborn","breastfeeding","gestational","preeclampsia"],sp:"Obstetrics & Maternal Care",urg:"urgent",hosp:[16,4,15,14,7]},
+gynecology:{kw:["period","menstrual","irregular periods","pcos","endometriosis","fibroids","ovarian cyst","uterus","cervix","infertility","fertility","ivf","menopause","vaginal","pap smear","abnormal bleeding","contraception"],sp:"Gynecology & Reproductive Medicine",urg:"routine",hosp:[16,4,14,15]},
+pediatrics:{kw:["child","children","infant","baby","toddler","pediatric","newborn","neonatal","nicu","growth","developmental","vaccination","fever in child","sick child","adolescent"],sp:"Pediatrics & Neonatology",urg:"routine",hosp:[16,1,10,13,15,4]},
+ophthalmology:{kw:["eye","vision","blurred vision","blindness","cataract","glaucoma","retina","macular","eye pain","red eye","cornea","lasik","squint","diabetic eye"],sp:"Ophthalmology",urg:"routine",hosp:[1,14,5,10,12]},
+nephrology:{kw:["kidney","renal","dialysis","kidney failure","proteinuria","hematuria","creatinine","glomerulonephritis","nephrotic","renal failure","ckd","chronic kidney"],sp:"Nephrology",urg:"urgent",hosp:[17,12,1,3]},
+urology:{kw:["urinary frequency","incontinence","prostate","bladder","kidney stone","urethra","uti","dysuria","erectile dysfunction","male infertility","testicular pain","urinary retention","blood in urine"],sp:"Urology",urg:"routine",hosp:[17,4,12,19]},
+gastroenterology:{kw:["stomach","gastric","digestive","abdominal pain","diarrhea","constipation","vomiting","nausea","liver","hepatitis","cirrhosis","jaundice","gastritis","ulcer","crohn","colitis","gallbladder","heartburn","gerd","reflux","bloating"],sp:"Gastroenterology & Hepatology",urg:"routine",hosp:[12,13,1,10]},
+dermatology:{kw:["skin","rash","eczema","psoriasis","acne","dermatitis","wound","ulcer","leprosy","vitiligo","hair loss","alopecia","nail","fungal","skin cancer","allergy skin","hives","itching"],sp:"Dermatology",urg:"routine",hosp:[5,14,13,4,11,19]},
+ent:{kw:["ear","hearing loss","deafness","tinnitus","nose","nasal","sinusitis","sinus","throat","tonsil","voice","hoarseness","snoring","sleep apnea","ent","neck mass"],sp:"ENT (Ear, Nose & Throat)",urg:"routine",hosp:[4,1,10,12]},
+psychiatry:{kw:["depression","anxiety","mental health","schizophrenia","bipolar","psychosis","ptsd","stress","insomnia","addiction","alcohol","substance abuse","ocd","panic attack","suicide","self-harm","hallucination"],sp:"Psychiatry & Mental Health",urg:"urgent",hosp:[6,1,14]},
+plastic:{kw:["burn","burns","scar","keloid","skin graft","reconstructive","cleft","hand surgery","amputation","wound healing","plastic surgery","disfigurement"],sp:"Plastic & Reconstructive Surgery",urg:"routine",hosp:[5,2,1]},
+endocrinology:{kw:["diabetes","diabetic","thyroid","hypothyroid","hyperthyroid","goiter","hormone","endocrine","adrenal","pituitary","obesity","insulin","blood sugar","metabolic"],sp:"Endocrinology & Diabetes",urg:"routine",hosp:[1,12,18,15]},
+pulmonology:{kw:["lungs","lung","cough","asthma","tb","tuberculosis","copd","bronchitis","pneumonia","breathing difficulty","respiratory","pleural","pulmonary fibrosis","chest infection","sputum"],sp:"Pulmonology & TB",urg:"urgent",hosp:[8,1,4,12]},
+hematology:{kw:["anemia","sickle cell","thalassemia","bleeding disorder","clotting","platelet","dvt","blood clot","coagulation","blood disorder","bruising easily"],sp:"Hematology",urg:"urgent",hosp:[1,4,18,11]},
+dentistry:{kw:["tooth","teeth","dental","gum","mouth","cavity","toothache","jaw","wisdom tooth","implant","braces","orthodontic","root canal","oral","bleeding gums"],sp:"Dentistry & Oral Surgery",urg:"routine",hosp:[13,19,10]},
+fistula:{kw:["fistula","obstetric fistula","urinary leakage after delivery","incontinence after childbirth","vesicovaginal","leaking urine after birth"],sp:"Obstetric Fistula Repair (FREE at Hamlin Hospital)",urg:"urgent",hosp:[7,16,4]},
+emergency:{kw:["emergency","accident","trauma","road accident","unconscious","collapse","severe bleeding","poisoning","critical","not breathing"],sp:"Emergency Medicine",urg:"emergency",hosp:[1,4,9,12,18]}
+};
+
+const FILTERS=["All","Cardiology","Neurology","Oncology","Orthopedics","OB/Gynecology","Pediatrics","Surgery","Internal Medicine","Ophthalmology","Dermatology","Nephrology/Urology","ENT","Psychiatry","Dentistry","TB/Pulmonology","Burns/Plastic","Fistula"];
+const FM={"Cardiology":["cardiology"],"Neurology":["neurology","neurosurgery"],"Oncology":["oncology"],"Orthopedics":["orthopedics"],"OB/Gynecology":["obstetrics","gynecology","fertility","ivf","fistula"],"Pediatrics":["pediatrics","neonatology"],"Surgery":["surgery"],"Internal Medicine":["internal"],"Ophthalmology":["ophthalmology"],"Dermatology":["dermatology"],"Nephrology/Urology":["nephrology","urology","renal","dialysis","kidney"],"ENT":["ent"],"Psychiatry":["psychiatry","mental health","addiction"],"Dentistry":["dentistry"],"TB/Pulmonology":["tb","tuberculosis","pulmonology"],"Burns/Plastic":["burns","plastic surgery","reconstructive"],"Fistula":["fistula"]};
+
+function getH(id){return H.find(h=>h.id===id);}
+function analyzeSymptoms(txt){
+  const l=txt.toLowerCase(),scores={};
+  for(const[cat,d]of Object.entries(SYMP)){for(const kw of d.kw){if(l.includes(kw)){scores[cat]=(scores[cat]||0)+1;break;}}}
+  const sorted=Object.entries(scores).sort((a,b)=>b[1]-a[1]);
+  if(!sorted.length)return null;
+  const tops=sorted.slice(0,3).map(([c])=>c),uo=["emergency","urgent","routine"];
+  let urg="routine";const ids=[];
+  tops.forEach(c=>{const d=SYMP[c];if(uo.indexOf(d.urg)<uo.indexOf(urg))urg=d.urg;d.hosp.forEach(id=>{if(!ids.includes(id))ids.push(id);});});
+  return{cats:tops,specialties:tops.map(c=>SYMP[c].sp),urgency:urg,hospitals:ids.slice(0,4).map(getH).filter(Boolean)};
+}
+
+/* ─── AI TRIAGE ─────────────────────────────────────────────────────────
+   Calls your own free backend (Netlify Function or Cloudflare Worker).
+   The Gemini / Cloudflare key lives on the server — never in this file.
+   Cloudflare users: change TRIAGE_ENDPOINT to your Worker URL, e.g.
+   "https://mediguide-triage.YOUR-NAME.workers.dev"                       */
+const TRIAGE_ENDPOINT="/.netlify/functions/triage";
+async function callTriage(sym,onChunk){
+  const resp=await fetch(TRIAGE_ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({symptoms:sym})});
+  const data=await resp.json().catch(()=>({}));
+  if(!resp.ok||!data.text)throw new Error(data.error||("Error "+resp.status));
+  const words=data.text.split(" ");let shown="";
+  for(let i=0;i<words.length;i++){shown+=(i?" ":"")+words[i];onChunk(shown);await new Promise(r=>setTimeout(r,16));}
+}
+
+function Disclaimer({onBack}){
+  const secs=[
+    ["1. General Information Only","MediGuide Ethiopia is an informational directory to help patients locate specialized medical centers in Addis Ababa, Ethiopia. All content — hospital descriptions, specialist names, specialties, contact details, and AI-generated guidance — is for general informational purposes only and does not constitute medical advice, diagnosis, or treatment."],
+    ["2. Not a Substitute for Professional Medical Advice","Nothing on this platform replaces professional medical advice, diagnosis, or treatment from a qualified, licensed healthcare provider. Always seek the advice of your physician with any questions about a medical condition. Never disregard professional medical advice or delay seeking it because of information found here."],
+    ["3. AI Symptom Checker Disclaimer","The Symptom Checker uses a generative AI model (Google Gemini or Cloudflare Workers AI, depending on how this site is configured) through a secure server-side function. This AI is NOT a medical professional, does NOT have access to your medical records, and CANNOT diagnose any condition. AI responses are for general guidance only and may be incomplete, inaccurate or inapplicable to you. Never rely on AI for emergencies."],
+    ["4. Emergency Situations","If you are experiencing a medical emergency — chest pain, difficulty breathing, stroke, severe bleeding, loss of consciousness, or any life-threatening condition — CALL 911 IMMEDIATELY or go to the nearest Emergency Room. Do NOT use this platform in an emergency."],
+    ["5. Accuracy of Listings","We strive for accuracy but cannot guarantee completeness or timeliness of hospital listings, physician names, contact numbers, or service descriptions. Physician availability and hospital services change frequently. Always verify directly with the hospital before making medical decisions."],
+    ["6. Physician Listings","Physician names are based on publicly available information. Availability, department assignments, and affiliations change. Always call the hospital to confirm a specific physician is currently practicing and available for appointments."],
+    ["7. No Endorsement","Listing a hospital or provider does not constitute an endorsement or guarantee of quality. MediGuide Ethiopia does not evaluate, certify, or accredit any facility or practitioner."],
+    ["8. Data Privacy","The symptoms you type are sent to a third-party AI provider through this site's server-side function. On free tiers, providers (including Google) may use submitted content to improve their products. Do NOT enter your name, phone number, ID numbers, or other identifying details. This website does not store your symptom text."],
+    ["9. Limitation of Liability","MediGuide Ethiopia and its creators shall not be liable for any damages arising from use of or reliance on this platform, including decisions made based on AI content, inability to reach a hospital using listed contacts, changes in physician availability, or any medical outcome."],
+    ["10. Corrections & Updates","If you find inaccurate or outdated information, please notify us. We rely on users and healthcare providers to maintain accuracy for the Ethiopian medical community."]
+  ];
+  return E("div",{style:{maxWidth:780,margin:"0 auto",padding:"24px 20px 60px"}},
+    E("button",{onClick:onBack,style:{background:"transparent",border:"1px solid #1e3a6e",color:"#8ea8d0",padding:"7px 16px",borderRadius:8,fontSize:12,cursor:"pointer",marginBottom:24}},"← Back"),
+    E("div",{style:{background:"#0f2040",border:"1px solid #1e3a6e",borderRadius:16,padding:"32px 36px"}},
+      E("div",{style:{fontSize:26,fontWeight:900,fontFamily:"'Playfair Display',serif",color:"#c8a951",marginBottom:4}},"Legal Disclaimer"),
+      E("div",{style:{fontSize:11,color:"#4a6a9a",marginBottom:28}},"MediGuide Ethiopia · Last updated: May 2026"),
+      secs.map(([t,b],i)=>E("div",{key:i,className:"disc-section"},E("div",{className:"disc-title"},t),E("div",{className:"disc-body"},b))),
+      E("div",{style:{background:"#1a0808",border:"1px solid #4a1010",borderRadius:10,padding:"14px 18px",marginTop:4}},
+        E("div",{style:{fontSize:13,fontWeight:700,color:"#ff6666",marginBottom:8}},"⚠️ Emergency Numbers — Addis Ababa"),
+        E("div",{style:{fontSize:11,color:"#ffaaaa",lineHeight:2.1}},
+          "National Emergency: 911\nTikur Anbessa ER: +251 11 155 1211\nSt. Paul's ER: +251 11 127 5064\nAddis Cardiac: +251 11 660 0808\nEthio Tebib: +251 11 618 7345\nAddis Hiwot: +251 116 678000\nMCM Korean: +251 11 629 2963"
+        )
+      )
+    )
+  );
+}
+
+function HCard({h,open,toggle}){
+  const tc=h.type==="NGO"?"badge-ngo":h.type==="Public"?"badge-pub":"badge-priv";
+  return E("div",{className:`hosp-card${open?" open":""}`,onClick:toggle},
+    E("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:10}},
+      E("div",{style:{flex:1,minWidth:0}},
+        E("div",{style:{display:"flex",gap:7,flexWrap:"wrap",marginBottom:5}},
+          E("span",{className:tc},h.type+" Hospital"),E("span",{className:"badge-gold"},h.badge)
+        ),
+        E("div",{style:{fontSize:15,fontWeight:800,color:"#e8f0ff",marginBottom:2,lineHeight:1.3}},h.name),
+        E("div",{style:{fontSize:11,color:"#8ea8d0",marginBottom:3,fontFamily:"serif"}},h.am),
+        E("div",{style:{fontSize:11,color:"#8ea8d0",display:"flex",gap:12,flexWrap:"wrap"}},
+          E("span",null,"📍 ",h.addr),E("span",null,"📞 ",h.phone),E("span",null,"🛏 ",h.beds," beds"),E("span",null,"Est. ",h.est)
+        )
+      ),
+      E("div",{style:{color:"#c8a951",fontSize:16,flexShrink:0,marginTop:4}},open?"▲":"▼")
+    ),
+    open&&E("div",{style:{marginTop:16,borderTop:"1px solid #1e3a6e",paddingTop:16},onClick:e=>e.stopPropagation()},
+      E("p",{style:{color:"#8ea8d0",fontSize:12,marginBottom:14,lineHeight:1.75}},h.desc),
+      E("div",{style:{display:"flex",gap:18,flexWrap:"wrap",marginBottom:14,fontSize:12}},
+        h.web&&E("a",{href:h.web,target:"_blank",rel:"noopener noreferrer"},"🌐 Website"),
+        h.fb&&E("a",{href:h.fb,target:"_blank",rel:"noopener noreferrer"},"📘 Facebook"),
+        h.tg&&E("a",{href:h.tg,target:"_blank",rel:"noopener noreferrer"},"✈ Telegram")
+      ),
+      E("div",{style:{background:"#0a1a3a",border:"1px solid #1e3a6e",borderRadius:9,padding:"10px 14px",marginBottom:14,fontSize:12,color:"#8ea8d0"}},
+        E("span",{style:{color:"#c8a951",fontWeight:700}},"📅 Book Appointment: "),h.appt
+      ),
+      E("div",{style:{fontSize:10,color:"#4a6a9a",marginBottom:14}},"🌐 GPS: ",h.coords," — Search this hospital name in Google Maps for turn-by-turn directions"),
+      E("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))",gap:10}},
+        h.specs.map((s,i)=>E("div",{key:i,className:"sub-card"},
+          E("div",{style:{fontSize:13,fontWeight:700,color:"#c8a951",marginBottom:7}},s.icon," ",s.n),
+          E("div",{style:{marginBottom:9}},s.subs.map((sub,j)=>E("span",{key:j,className:"spec-pill"},sub))),
+          E("div",{style:{borderTop:"1px solid #1e3a6e",paddingTop:7}},
+            E("div",{style:{fontSize:9,color:"#4a6a9a",marginBottom:3,textTransform:"uppercase",letterSpacing:".05em"}},"Specialists"),
+            s.docs.map((d,k)=>E("div",{key:k,style:{fontSize:11,color:"#8ea8d0",padding:"2px 0"}},E("span",{style:{color:"#c8a951"}},"◈")," ",d))
+          )
+        ))
+      )
+    )
+  );
+}
+
+function SymptomChecker(){
+  const[input,setInput]=useState("");
+  const[step,setStep]=useState(0);
+  const[loading,setLoading]=useState(false);
+  const[aiText,setAiText]=useState("");
+  const[result,setResult]=useState(null);
+  const[err,setErr]=useState("");
+  const aiRef=useRef("");
+
+  const submit=async()=>{
+    if(!input.trim())return;
+    setLoading(true);setAiText("");setErr("");aiRef.current="";
+    setResult(analyzeSymptoms(input));setStep(1);
+    try{await callTriage(input,t=>{aiRef.current=t;setAiText(t);});}
+    catch(e){
+      setErr("AI guidance is temporarily unavailable (free-tier limit reached or network issue). The keyword-matched recommendations above are still valid — please call the hospital directly.");
+    }
+    setLoading(false);
+  };
+
+  const reset=()=>{setStep(0);setInput("");setAiText("");setResult(null);setErr("");};
+  const urgColor=r=>r==="emergency"?"#ff3333":r==="urgent"?"#ff9900":"#22c55e";
+  const urgLabel=r=>r==="emergency"?"⚠ EMERGENCY — Go to Emergency Room Now":r==="urgent"?"◉ URGENT — Seek Care Within 24-48 Hours":"◎ ROUTINE — Schedule an Appointment";
+
+  return E("div",{style:{background:"linear-gradient(135deg,#0a1a3a,#0f2050)",border:"2px solid #c8a951",borderRadius:16,padding:"24px 28px",marginBottom:28}},
+    E("div",{style:{display:"flex",alignItems:"center",gap:14,marginBottom:8}},
+      E("div",{style:{width:44,height:44,borderRadius:"50%",background:"#c8a951",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0}},"⚕"),
+      E("div",null,
+        E("div",{style:{fontSize:19,fontWeight:800,color:"#e8f0ff",fontFamily:"'Playfair Display',serif"}},"AI Medical Triage Assistant"),
+        E("div",{style:{fontSize:11,color:"#8ea8d0"}},"Powered by Google Gemini AI · Describe symptoms → Find the right specialist in Addis Ababa")
+      )
+    ),
+    E("div",{style:{height:1,background:"#1e3a6e",margin:"14px 0"}}),
+    step===0&&E("div",null,
+      E("div",{style:{fontSize:12,color:"#8ea8d0",fontWeight:600,marginBottom:5}},"Describe your symptoms in detail:"),
+      E("div",{style:{fontSize:10,color:"#4a6a9a",marginBottom:9}},'Example: "I have chest pain radiating to my left arm with shortness of breath for 2 hours"'),
+      E("textarea",{className:"sym-area",value:input,onChange:e=>setInput(e.target.value),onKeyDown:e=>{if(e.key==="Enter"&&e.ctrlKey)submit();},placeholder:"Describe your symptoms, duration, severity, and any relevant medical history..."}),
+      E("div",{style:{display:"flex",gap:7,flexWrap:"wrap",margin:"9px 0 13px"}},
+        ["Chest pain and palpitations","Severe headache and vomiting","Knee pain after injury","Abnormal vaginal bleeding","Skin rash and itching","Child with high fever","Urinary leaking after delivery","Persistent cough with blood","Feeling sad and hopeless","Burns on arm"].map((ex,i)=>
+          E("button",{key:i,className:"ex-btn",onClick:()=>setInput(ex)},ex)
+        )
+      ),
+      E("button",{className:`submit-btn ${input.trim()?"on":"off"}`,onClick:submit,disabled:!input.trim()},loading?"Analyzing...":"Find My Specialist & Hospital →")
+    ),
+    step===1&&E("div",{style:{animation:"fadeIn .35s ease"}},
+      E("div",{style:{background:"#070f1e",borderRadius:9,padding:"9px 13px",marginBottom:14,border:"1px solid #1e3a6e",fontSize:12}},
+        E("span",{style:{color:"#4a6a9a"}},"Your symptoms: "),E("span",{style:{color:"#8ea8d0"}},input)
+      ),
+      result&&E("div",null,
+        E("div",{className:`urg-${result.urgency}`},urgLabel(result.urgency)),
+        E("div",{style:{display:"flex",gap:7,flexWrap:"wrap",marginBottom:14}},
+          result.specialties.map((sp,i)=>E("span",{key:i,style:{background:"#0d2040",border:"1px solid #3b82f6",color:"#3b82f6",padding:"4px 12px",borderRadius:18,fontSize:11,fontWeight:600}},"⚕ ",sp))
+        ),
+        E("div",{style:{marginBottom:14}},
+          E("div",{style:{fontSize:12,fontWeight:700,color:"#c8a951",marginBottom:9}},"Recommended Hospitals & Specialists"),
+          result.hospitals.map((h,i)=>E("div",{key:i,className:`rec-card${i===0?" top":""}`},
+            E("div",{className:"num-circle",style:{background:i===0?"#c8a951":"#1e3a6e",color:i===0?"#0a0800":"#8ea8d0"}},"#"+(i+1)),
+            E("div",{style:{flex:1,minWidth:0}},
+              E("div",{style:{fontSize:12,fontWeight:700,color:i===0?"#c8a951":"#e8f0ff",marginBottom:2}},h.name),
+              E("div",{style:{fontSize:11,color:"#8ea8d0"}},"📍 ",h.addr),
+              E("div",{style:{fontSize:11,color:"#8ea8d0"}},"📞 ",h.phone," · ",h.appt),
+              E("div",{style:{fontSize:11,color:"#8ea8d0",marginTop:3}},h.specs.slice(0,2).flatMap(s=>s.docs).slice(0,2).map((d,k)=>E("span",{key:k,style:{marginRight:10}},"◈ ",d)))
+            )
+          ))
+        )
+      ),
+      E("div",{style:{background:"#070f1e",borderRadius:9,padding:"14px 18px",border:"1px solid #1e3a6e",marginBottom:14}},
+        E("div",{style:{fontSize:12,fontWeight:700,color:"#c8a951",marginBottom:9}},"⚕ AI Clinical Guidance",loading&&E("span",{style:{fontSize:10,color:"#8ea8d0",fontWeight:400,marginLeft:8}},"Generating...")),
+        aiText?E("div",{style:{fontSize:12,color:"#8ea8d0",lineHeight:1.85,whiteSpace:"pre-wrap"}},aiText):
+          loading?E("div",{style:{display:"flex",gap:5,alignItems:"center",color:"#4a6a9a",fontSize:12}},
+            E("span",{className:"dot1"},"●"),E("span",{className:"dot2"},"●"),E("span",{className:"dot3"},"●"),E("span",{style:{marginLeft:7}},"Generating personalized clinical guidance...")
+          ):null,
+        err&&E("div",{style:{color:"#ff9900",fontSize:11,marginTop:8}},err)
+      ),
+      E("div",{style:{background:"#1a0808",border:"1px solid #4a1010",borderRadius:9,padding:"10px 14px",fontSize:10,color:"#ff8080",marginBottom:12}},
+        "⚠️ General information only. Not a substitute for professional medical advice. Always consult a licensed physician."
+      ),
+      E("button",{className:"reset-btn",onClick:reset},"← Start Over")
+    )
+  );
+}
+
+function App(){
+  const[tab,setTab]=useState("directory");
+  const[filter,setFilter]=useState("All");
+  const[search,setSearch]=useState("");
+  const[open,setOpen]=useState(null);
+
+  const filtered=H.filter(h=>{
+    const ms=!search||h.name.toLowerCase().includes(search.toLowerCase())||h.am.includes(search)||h.addr.toLowerCase().includes(search.toLowerCase())||h.specs.some(s=>s.n.toLowerCase().includes(search.toLowerCase())||s.subs.some(sub=>sub.toLowerCase().includes(search.toLowerCase()))||s.docs.some(d=>d.toLowerCase().includes(search.toLowerCase())));
+    if(!ms)return false;
+    if(filter==="All")return true;
+    const tags=FM[filter]||[];return h.tags.some(t=>tags.includes(t));
+  });
+
+  if(tab==="disclaimer")return E("div",{style:{background:"#0a1628",minHeight:"100vh"}},
+    E("div",{style:{background:"linear-gradient(180deg,#050e20,#0a1628)",borderBottom:"1px solid #1e3a6e",padding:"14px 24px",display:"flex",alignItems:"center",gap:12}},
+      E("div",{style:{width:36,height:36,borderRadius:8,background:"linear-gradient(135deg,#078930 40%,#FCDD09 100%)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}},"⚕"),
+      E("div",{style:{fontSize:16,fontWeight:900,fontFamily:"'Playfair Display',serif",color:"#c8a951"}},"MediGuide Ethiopia")
+    ),
+    E(Disclaimer,{onBack:()=>setTab("directory")})
+  );
+
+  return E("div",{style:{background:"#0a1628",minHeight:"100vh"}},
+    E("div",{style:{background:"linear-gradient(180deg,#050e20,#0a1628)",borderBottom:"1px solid #1e3a6e",padding:"0 22px"}},
+      E("div",{style:{maxWidth:1100,margin:"0 auto"}},
+        E("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"13px 0",flexWrap:"wrap",gap:10}},
+          E("div",{style:{display:"flex",alignItems:"center",gap:12}},
+            E("div",{style:{width:40,height:40,borderRadius:10,background:"linear-gradient(135deg,#078930 40%,#FCDD09 100%)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:19}},"⚕"),
+            E("div",null,
+              E("div",{style:{fontSize:17,fontWeight:900,fontFamily:"'Playfair Display',serif",color:"#c8a951"}},"MediGuide Ethiopia"),
+              E("div",{style:{fontSize:9,color:"#8ea8d0",letterSpacing:".09em"}},"ADDIS ABABA SPECIALIZED MEDICAL DIRECTORY")
+            )
+          ),
+          E("div",{style:{display:"flex",gap:6,flexWrap:"wrap"}},
+            [["directory","🏥 Directory"],["symptom","⚕ Symptom Checker"],["disclaimer","📋 Disclaimer"]].map(([t,l])=>
+              E("button",{key:t,className:`nav-btn${tab===t?" active":""}`,onClick:()=>setTab(t)},l)
+            )
+          )
+        )
+      )
+    ),
+    E("div",{style:{background:"linear-gradient(135deg,#061020,#0a1a30)",borderBottom:"1px solid #1e3a6e",padding:"26px 22px"}},
+      E("div",{style:{maxWidth:1100,margin:"0 auto"}},
+        E("div",{style:{textAlign:"center",marginBottom:20}},
+          E("div",{style:{fontSize:10,color:"#c8a951",letterSpacing:".12em",textTransform:"uppercase",marginBottom:9,fontWeight:600}},"The Complete Guide to Specialized Healthcare"),
+          E("h1",{style:{fontSize:26,fontWeight:900,fontFamily:"'Playfair Display',serif",color:"#e8f0ff",marginBottom:7,lineHeight:1.2}},"Specialized Medical Care in ",E("span",{style:{color:"#c8a951"}},"Addis Ababa, Ethiopia")),
+          E("p",{style:{fontSize:12,color:"#8ea8d0",maxWidth:560,margin:"0 auto",lineHeight:1.75}},"Comprehensive directory of hospitals, specialties, sub-specialties & specialists — with AI-powered symptom triage to guide every patient to the right care")
+        ),
+        E("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(130px,1fr))",gap:10}},
+          [{n:"19",l:"Medical Centers"},{n:"120+",l:"Specialists"},{n:"60+",l:"Sub-specialties"},{n:"5,500+",l:"Hospital Beds"},{n:"24/7",l:"Emergency"},{n:"FREE",l:"Fistula Hospital"}].map((s,i)=>
+            E("div",{key:i,className:"stat-card"},E("div",{style:{fontSize:22,fontWeight:900,color:"#c8a951",lineHeight:1}},s.n),E("div",{style:{fontSize:9,color:"#8ea8d0",marginTop:4,textTransform:"uppercase",letterSpacing:".06em"}},s.l))
+          )
+        )
+      )
+    ),
+    E("div",{style:{background:"#1a0808",borderBottom:"1px solid #4a0808",padding:"8px 22px"}},
+      E("div",{style:{maxWidth:1100,margin:"0 auto",display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}},
+        E("span",{style:{color:"#ff4444",fontWeight:800,fontSize:11,flexShrink:0}},"⚠ EMERGENCY: Dial 911"),
+        E("span",{style:{color:"#ffaaaa",fontSize:10}},"Tikur Anbessa: +251 11 155 1211 · St. Paul's: +251 11 127 5064 · Addis Cardiac: +251 11 660 0808 · Ethio Tebib: +251 11 618 7345 · Addis Hiwot: +251 116 678000 · MCM Korean: +251 11 629 2963")
+      )
+    ),
+    E("div",{style:{maxWidth:1100,margin:"0 auto",padding:"24px 22px 60px"}},
+      tab==="symptom"&&E("div",{style:{animation:"fadeIn .35s ease"}},
+        E("div",{style:{marginBottom:18}},
+          E("h2",{style:{fontSize:20,fontWeight:800,color:"#e8f0ff",marginBottom:5}},"Find Your Specialist"),
+          E("p",{style:{color:"#8ea8d0",fontSize:12}},"Describe your symptoms and our AI will identify the right specialty and recommend the best hospitals and physicians in Addis Ababa.")
+        ),
+        E(SymptomChecker,null),
+        E("h3",{style:{fontSize:15,fontWeight:700,color:"#e8f0ff",marginBottom:12}},"Quick Specialty Reference"),
+        E("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(175px,1fr))",gap:10}},
+          [{icon:"♥",name:"Heart Conditions",go:"Addis Cardiac Hospital",desc:"Chest pain, palpitations, arrhythmia, hypertension"},{icon:"⚡",name:"Brain & Nerves",go:"Tikur Anbessa / Hayat",desc:"Headache, stroke, epilepsy, weakness, dementia"},{icon:"◆",name:"Women's Health",go:"Anania / St. Paul's / AMC",desc:"Pregnancy, IVF, gynecology, waterbirth"},{icon:"✦",name:"Bones & Joints",go:"Tikur Anbessa / Hayat",desc:"Fractures, knee/hip/back pain, scoliosis"},{icon:"⊕",name:"Cancer Care",go:"Tikur Anbessa (Radiotherapy)",desc:"Tumors, chemotherapy, radiation — ONLY in Ethiopia"},{icon:"◎",name:"Kidney & Urology",go:"Santé / Ethio Tebib",desc:"Dialysis, CKD, kidney stones, prostate"},{icon:"◈",name:"Mental Health",go:"Amanuel Hospital",desc:"Depression, psychosis, addiction — ONLY psych hospital"},{icon:"◆",name:"Obstetric Fistula",go:"Hamlin Fistula (FREE!)",desc:"Urinary leaking after delivery — all care is FREE"},{icon:"✦",name:"Burns & Skin Grafting",go:"Yekatit 12 (Pioneer)",desc:"Burns, skin grafts, reconstructive surgery"},{icon:"◎",name:"TB & Lung Disease",go:"St. Peter Hospital",desc:"TB, MDR-TB, COPD, pulmonary fibrosis"},{icon:"◉",name:"Eye Problems",go:"Tikur Anbessa / MCM",desc:"Cataract, glaucoma, LASIK, diabetic eye"},{icon:"◈",name:"Skin & Leprosy",go:"ALERT Hospital",desc:"Leprosy, tropical skin, HIV skin diseases"}].map((item,i)=>
+            E("div",{key:i,className:"quick-card"},
+              E("div",{style:{fontSize:18,marginBottom:5}},item.icon),
+              E("div",{style:{fontSize:12,fontWeight:700,color:"#e8f0ff",marginBottom:3}},item.name),
+              E("div",{style:{fontSize:10,color:"#c8a951",marginBottom:5,fontWeight:600}},"→ ",item.go),
+              E("div",{style:{fontSize:10,color:"#8ea8d0"}},item.desc)
+            )
+          )
+        )
+      ),
+      tab==="directory"&&E("div",{style:{animation:"fadeIn .35s ease"}},
+        E("div",{style:{marginBottom:18}},
+          E("input",{className:"search-inp",value:search,onChange:e=>setSearch(e.target.value),placeholder:"Search hospitals, specialties, sub-specialties, physicians, addresses..."}),
+          E("div",{style:{display:"flex",gap:6,flexWrap:"wrap"}},FILTERS.map(f=>E("button",{key:f,className:`filter-btn${filter===f?" active":""}`,onClick:()=>setFilter(f)},f)))
+        ),
+        E("div",{style:{fontSize:11,color:"#4a6a9a",marginBottom:12}},"Showing ",filtered.length," of ",H.length," medical centers",filter!=="All"?` · Filter: ${filter}`:"",E("span",{style:{marginLeft:14,color:"#1e3a6e"}},"🟢 Public  🔵 Private  🟡 NGO/Charitable")),
+        filtered.length===0?E("div",{style:{textAlign:"center",padding:"50px 0",color:"#8ea8d0"}},"No hospitals match your search."):
+          filtered.map(h=>E(HCard,{key:h.id,h,open:open===h.id,toggle:()=>setOpen(open===h.id?null:h.id)})),
+        E("div",{style:{marginTop:32,background:"#0f2040",border:"1px solid #1e3a6e",borderRadius:14,padding:"22px 26px"}},
+          E("div",{style:{fontSize:17,fontWeight:800,color:"#e8f0ff",marginBottom:5}},"📍 All Hospital Locations — Addis Ababa"),
+          E("div",{style:{fontSize:11,color:"#8ea8d0",marginBottom:16}},"All 19 medical centers with GPS coordinates. Search any hospital name in Google Maps for turn-by-turn directions."),
+          E("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(290px,1fr))",gap:9}},
+            H.map((h,i)=>E("div",{key:i,className:"loc-card"},
+              E("div",{style:{width:24,height:24,borderRadius:"50%",background:"#c8a951",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:9,fontWeight:800,color:"#0a0800"}},i+1),
+              E("div",null,E("div",{style:{fontSize:11,fontWeight:700,color:"#e8f0ff",marginBottom:1}},h.name),E("div",{style:{fontSize:10,color:"#8ea8d0"}},"📍 ",h.addr),E("div",{style:{fontSize:9,color:"#4a6a9a"}},"🌐 ",h.coords),E("div",{style:{fontSize:10,color:"#8ea8d0"}},"📞 ",h.phone))
+            ))
+          )
+        )
+      )
+    ),
+    E("div",{style:{background:"#050e20",borderTop:"1px solid #1e3a6e",padding:"22px"}},
+      E("div",{style:{maxWidth:1100,margin:"0 auto",textAlign:"center"}},
+        E("div",{style:{fontSize:16,fontWeight:900,fontFamily:"'Playfair Display',serif",color:"#c8a951",marginBottom:7}},"MediGuide Ethiopia"),
+        E("p",{style:{fontSize:11,color:"#8ea8d0",maxWidth:580,margin:"0 auto 12px",lineHeight:1.75}},"Comprehensive medical directory for Addis Ababa, Ethiopia. For guidance only — always verify with hospitals directly. Physician rosters change; call ahead to confirm."),
+        E("div",{style:{display:"flex",gap:7,flexWrap:"wrap",justifyContent:"center",marginBottom:10}},
+          ["🟢 Public Hospitals","🔵 Private Hospitals","🟡 NGO/Charitable","⚕ AI Symptom Triage"].map((item,i)=>E("span",{key:i,style:{background:"#0f2040",border:"1px solid #1e3a6e",color:"#8ea8d0",padding:"3px 11px",borderRadius:18,fontSize:10}},item))
+        ),
+        E("button",{onClick:()=>setTab("disclaimer"),style:{background:"transparent",border:"1px solid #1e3a6e",color:"#8ea8d0",padding:"5px 14px",borderRadius:7,fontSize:11,cursor:"pointer",marginBottom:9}},"📋 Read Legal Disclaimer"),
+        E("div",{style:{fontSize:10,color:"#4a6a9a"}},"© 2026 MediGuide Ethiopia · Addis Ababa, Ethiopia · Emergency: Dial 911")
+      )
+    )
+  );
+}
+ReactDOM.render(E(App),document.getElementById("root"));
+</script>
+</body>
+</html>

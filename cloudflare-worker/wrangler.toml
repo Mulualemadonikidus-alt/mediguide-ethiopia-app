@@ -1,0 +1,15 @@
+name = "mediguide-triage"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+
+# Option B (no Gemini key needed): Cloudflare Workers AI on the free plan.
+[ai]
+binding = "AI"
+
+[vars]
+# Put your website URL here once deployed, e.g. "https://mediguide-ethiopia.netlify.app"
+ALLOWED_ORIGIN = "*"
+# GEMINI_MODEL = "gemini-2.5-flash"
+# CF_AI_MODEL  = "@cf/meta/llama-3.1-8b-instruct"
+
+# Option A (Gemini): do NOT write the key here. Run:  npx wrangler secret put GEMINI_API_KEY
