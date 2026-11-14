@@ -263,6 +263,31 @@ function analyzeSymptoms(txt){
   return{cats:tops,specialties:tops.map(c=>SYMP[c].sp),urgency:urg,hospitals:ids.slice(0,4).map(getH).filter(Boolean)};
 }
 
+
+/* ─── AUTO-UPDATED DATA ──────────────────────────────────────────────────
+   public/data/hospitals-extra.json is maintained by the weekly GitHub Action
+   (reviewed and merged by the developer). Merged here at page load.        */
+let DIR_UPDATED="";
+function mergeExtras(extra){
+  if(!extra)return;
+  const ALIAS={"plastic surgery":"plastic",tb:"pulmonology",tuberculosis:"pulmonology",renal:"nephrology",dialysis:"nephrology",kidney:"nephrology",ivf:"gynecology",fertility:"gynecology",neonatology:"pediatrics","mental health":"psychiatry",addiction:"psychiatry"};
+  (extra.hospitals||[]).forEach(x=>{
+    if(!x||H.some(h=>h.id===x.id))return;
+    x.specs=x.specs||[];x.tags=x.tags||[];H.push(x);
+    x.tags.forEach(t=>{const k=SYMP[t]?t:ALIAS[t];if(k&&SYMP[k]&&!SYMP[k].hosp.includes(x.id))SYMP[k].hosp.push(x.id);});
+  });
+  (extra.doctorAdditions||[]).forEach(d=>{
+    const h=H.find(h=>h.id===d.hospitalId);if(!h||!d.name)return;
+    const bare=d.name.split("(")[0].trim().toLowerCase();
+    if(h.specs.some(s=>s.docs.some(x=>x.toLowerCase().includes(bare))))return;
+    const key=(d.specialty||"").toLowerCase();
+    let sp=key?h.specs.find(s=>s.n.toLowerCase().includes(key)||key.includes(s.n.toLowerCase())):null;
+    if(!sp){sp={n:d.specialty||"Other specialists",icon:"◈",subs:[],docs:[]};h.specs.push(sp);}
+    sp.docs.push(d.name+" · newly listed");
+  });
+  DIR_UPDATED=extra.lastUpdated||"";
+}
+
 /* ─── AI TRIAGE ─────────────────────────────────────────────────────────
    Calls your own free backend (Netlify Function or Cloudflare Worker).
    The Gemini / Cloudflare key lives on the server — never in this file.
@@ -283,7 +308,7 @@ function Disclaimer({onBack}){
     ["2. Not a Substitute for Professional Medical Advice","Nothing on this platform replaces professional medical advice, diagnosis, or treatment from a qualified, licensed healthcare provider. Always seek the advice of your physician with any questions about a medical condition. Never disregard professional medical advice or delay seeking it because of information found here."],
     ["3. AI Symptom Checker Disclaimer","The Symptom Checker uses a generative AI model (Google Gemini or Cloudflare Workers AI, depending on how this site is configured) through a secure server-side function. This AI is NOT a medical professional, does NOT have access to your medical records, and CANNOT diagnose any condition. AI responses are for general guidance only and may be incomplete, inaccurate or inapplicable to you. Never rely on AI for emergencies."],
     ["4. Emergency Situations","If you are experiencing a medical emergency — chest pain, difficulty breathing, stroke, severe bleeding, loss of consciousness, or any life-threatening condition — CALL 911 IMMEDIATELY or go to the nearest Emergency Room. Do NOT use this platform in an emergency."],
-    ["5. Accuracy of Listings","We strive for accuracy but cannot guarantee completeness or timeliness of hospital listings, physician names, contact numbers, or service descriptions. Physician availability and hospital services change frequently. Always verify directly with the hospital before making medical decisions."],
+    ["5. Accuracy of Listings","We strive for accuracy but cannot guarantee completeness or timeliness of hospital listings, physician names, contact numbers, or service descriptions. Physician availability and hospital services change frequently. Always verify directly with the hospital before making medical decisions. New entries are found automatically from public web pages and are reviewed by the site owner before publication."],
     ["6. Physician Listings","Physician names are based on publicly available information. Availability, department assignments, and affiliations change. Always call the hospital to confirm a specific physician is currently practicing and available for appointments."],
     ["7. No Endorsement","Listing a hospital or provider does not constitute an endorsement or guarantee of quality. MediGuide Ethiopia does not evaluate, certify, or accredit any facility or practitioner."],
     ["8. Data Privacy","The symptoms you type are sent to a third-party AI provider through this site's server-side function. On free tiers, providers (including Google) may use submitted content to improve their products. Do NOT enter your name, phone number, ID numbers, or other identifying details. This website does not store your symptom text."],
@@ -317,13 +342,14 @@ function HCard({h,open,toggle}){
         E("div",{style:{fontSize:15,fontWeight:800,color:"#e8f0ff",marginBottom:2,lineHeight:1.3}},h.name),
         E("div",{style:{fontSize:11,color:"#8ea8d0",marginBottom:3,fontFamily:"serif"}},h.am),
         E("div",{style:{fontSize:11,color:"#8ea8d0",display:"flex",gap:12,flexWrap:"wrap"}},
-          E("span",null,"📍 ",h.addr),E("span",null,"📞 ",h.phone),E("span",null,"🛏 ",h.beds," beds"),E("span",null,"Est. ",h.est)
+          E("span",null,"📍 ",h.addr),h.phone?E("span",null,"📞 ",h.phone):null,h.beds?E("span",null,"🛏 ",h.beds," beds"):null,h.est?E("span",null,"Est. ",h.est):null
         )
       ),
       E("div",{style:{color:"#c8a951",fontSize:16,flexShrink:0,marginTop:4}},open?"▲":"▼")
     ),
     open&&E("div",{style:{marginTop:16,borderTop:"1px solid #1e3a6e",paddingTop:16},onClick:e=>e.stopPropagation()},
       E("p",{style:{color:"#8ea8d0",fontSize:12,marginBottom:14,lineHeight:1.75}},h.desc),
+      h.addedOn&&E("div",{style:{fontSize:10,color:"#c8a951",marginBottom:12}},"🆕 Added "+h.addedOn+" after web verification · Sources: ",(h.sources||[]).slice(0,3).map((u,i)=>E("a",{key:i,href:u,target:"_blank",rel:"noopener noreferrer",style:{marginRight:8}},"["+(i+1)+"]"))),
       E("div",{style:{display:"flex",gap:18,flexWrap:"wrap",marginBottom:14,fontSize:12}},
         h.web&&E("a",{href:h.web,target:"_blank",rel:"noopener noreferrer"},"🌐 Website"),
         h.fb&&E("a",{href:h.fb,target:"_blank",rel:"noopener noreferrer"},"📘 Facebook"),
@@ -332,7 +358,7 @@ function HCard({h,open,toggle}){
       E("div",{style:{background:"#0a1a3a",border:"1px solid #1e3a6e",borderRadius:9,padding:"10px 14px",marginBottom:14,fontSize:12,color:"#8ea8d0"}},
         E("span",{style:{color:"#c8a951",fontWeight:700}},"📅 Book Appointment: "),h.appt
       ),
-      E("div",{style:{fontSize:10,color:"#4a6a9a",marginBottom:14}},"🌐 GPS: ",h.coords," — Search this hospital name in Google Maps for turn-by-turn directions"),
+      E("div",{style:{fontSize:10,color:"#4a6a9a",marginBottom:14}},h.coords?("🌐 GPS: "+h.coords+" — "):"",E("a",{href:"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(h.name+" Addis Ababa"),target:"_blank",rel:"noopener noreferrer"},"🗺 Open in Google Maps for directions")),
       E("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))",gap:10}},
         h.specs.map((s,i)=>E("div",{key:i,className:"sub-card"},
           E("div",{style:{fontSize:13,fontWeight:700,color:"#c8a951",marginBottom:7}},s.icon," ",s.n),
@@ -477,7 +503,7 @@ function App(){
           E("p",{style:{fontSize:12,color:"#8ea8d0",maxWidth:560,margin:"0 auto",lineHeight:1.75}},"Comprehensive directory of hospitals, specialties, sub-specialties & specialists — with AI-powered symptom triage to guide every patient to the right care")
         ),
         E("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(130px,1fr))",gap:10}},
-          [{n:"19",l:"Medical Centers"},{n:"120+",l:"Specialists"},{n:"60+",l:"Sub-specialties"},{n:"5,500+",l:"Hospital Beds"},{n:"24/7",l:"Emergency"},{n:"FREE",l:"Fistula Hospital"}].map((s,i)=>
+          [{n:String(H.length),l:"Medical Centers"},{n:"120+",l:"Specialists"},{n:"60+",l:"Sub-specialties"},{n:"5,500+",l:"Hospital Beds"},{n:"24/7",l:"Emergency"},{n:"FREE",l:"Fistula Hospital"}].map((s,i)=>
             E("div",{key:i,className:"stat-card"},E("div",{style:{fontSize:22,fontWeight:900,color:"#c8a951",lineHeight:1}},s.n),E("div",{style:{fontSize:9,color:"#8ea8d0",marginTop:4,textTransform:"uppercase",letterSpacing:".06em"}},s.l))
           )
         )
@@ -518,11 +544,11 @@ function App(){
           filtered.map(h=>E(HCard,{key:h.id,h,open:open===h.id,toggle:()=>setOpen(open===h.id?null:h.id)})),
         E("div",{style:{marginTop:32,background:"#0f2040",border:"1px solid #1e3a6e",borderRadius:14,padding:"22px 26px"}},
           E("div",{style:{fontSize:17,fontWeight:800,color:"#e8f0ff",marginBottom:5}},"📍 All Hospital Locations — Addis Ababa"),
-          E("div",{style:{fontSize:11,color:"#8ea8d0",marginBottom:16}},"All 19 medical centers with GPS coordinates. Search any hospital name in Google Maps for turn-by-turn directions."),
+          E("div",{style:{fontSize:11,color:"#8ea8d0",marginBottom:16}},"All "+H.length+" medical centers. Use the Google Maps link in each card for directions."),
           E("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(290px,1fr))",gap:9}},
             H.map((h,i)=>E("div",{key:i,className:"loc-card"},
               E("div",{style:{width:24,height:24,borderRadius:"50%",background:"#c8a951",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:9,fontWeight:800,color:"#0a0800"}},i+1),
-              E("div",null,E("div",{style:{fontSize:11,fontWeight:700,color:"#e8f0ff",marginBottom:1}},h.name),E("div",{style:{fontSize:10,color:"#8ea8d0"}},"📍 ",h.addr),E("div",{style:{fontSize:9,color:"#4a6a9a"}},"🌐 ",h.coords),E("div",{style:{fontSize:10,color:"#8ea8d0"}},"📞 ",h.phone))
+              E("div",null,E("div",{style:{fontSize:11,fontWeight:700,color:"#e8f0ff",marginBottom:1}},h.name),E("div",{style:{fontSize:10,color:"#8ea8d0"}},"📍 ",h.addr),h.coords?E("div",{style:{fontSize:9,color:"#4a6a9a"}},"🌐 ",h.coords):null,h.phone?E("div",{style:{fontSize:10,color:"#8ea8d0"}},"📞 ",h.phone):null)
             ))
           )
         )
@@ -536,12 +562,13 @@ function App(){
           ["🟢 Public Hospitals","🔵 Private Hospitals","🟡 NGO/Charitable","⚕ AI Symptom Triage"].map((item,i)=>E("span",{key:i,style:{background:"#0f2040",border:"1px solid #1e3a6e",color:"#8ea8d0",padding:"3px 11px",borderRadius:18,fontSize:10}},item))
         ),
         E("button",{onClick:()=>setTab("disclaimer"),style:{background:"transparent",border:"1px solid #1e3a6e",color:"#8ea8d0",padding:"5px 14px",borderRadius:7,fontSize:11,cursor:"pointer",marginBottom:9}},"📋 Read Legal Disclaimer"),
-        E("div",{style:{fontSize:10,color:"#4a6a9a"}},"© 2026 MediGuide Ethiopia · Addis Ababa, Ethiopia · Emergency: Dial 911")
+        E("div",{style:{fontSize:10,color:"#4a6a9a"}},"© 2026 MediGuide Ethiopia · Addis Ababa, Ethiopia · Emergency: Dial 911"+(DIR_UPDATED?" · Directory last updated "+DIR_UPDATED:""))
       )
     )
   );
 }
-ReactDOM.render(E(App),document.getElementById("root"));
+fetch("/data/hospitals-extra.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).catch(()=>null)
+  .then(x=>{try{mergeExtras(x);}catch(e){console.error("extras skipped",e);}ReactDOM.render(E(App),document.getElementById("root"));});
 </script>
 </body>
 </html>
