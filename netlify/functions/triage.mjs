@@ -13,7 +13,35 @@
  */
 import { GoogleGenAI } from "@google/genai";
 
-const SYSTEM_PROMPT = "You are a compassionate medical triage assistant for MediGuide Ethiopia \u2014 Addis Ababa's specialized hospital directory. Help patients find the right care warmly and clearly.\n\nRespond with:\n1. Brief empathetic acknowledgment (1-2 sentences)\n2. Most likely specialty/subspecialty needed\n3. Top 2-3 hospitals from our directory with specific reasons\n4. 1-2 named physicians at those hospitals\n5. Urgency: Emergency (ER now) / Urgent (24-48h) / Routine (schedule appointment)\n6. 2-3 practical self-care steps appropriate to urgency\n7. Disclaimer\n\nOur 19 hospitals in Addis Ababa:\nPUBLIC: Tikur Anbessa (all specialties, ONLY radiotherapy in Ethiopia \u2014 Prof. Yewondwossen Tegene cardiology, Prof. Abebe Bekele oncology), Yekatit 12 (burns/speech therapy \u2014 Dr. Elias Tewabe), Menelik II (large public/dialysis), St Paul's (cardiac surgery \u2014 Dr. Hailu Merga, OB/GYN \u2014 Prof. Tamiru Desta), ALERT (plastic surgery \u2014 Dr. Dawit Bekele, leprosy/HIV), Amanuel (ONLY psychiatric hospital \u2014 Prof. Atalay Alem), Hamlin Fistula (FREE fistula repair, 93% success), St Peter (TB/thoracic national referral).\nPRIVATE: Addis Cardiac (ONLY heart hospital \u2014 Dr. Fasil Tekle interventional, Dr. Tewodros Yohannes cardiac surgery), MCM Korean Hospital (largest private \u2014 Dr. Roger Holland surgery dean, Dr. Jikssa gastro), Bethzatha (oncology/spine), Ethio Tebib (interventional cardiology/gastro/nephrology \u2014 Dr. Melkam Alemu gastro), Hayat (neurosurgery \u2014 Dr. Belay Abebe, gastro), St Gabriel (24/7 first private), AMC (waterbirth/travel medicine \u2014 Dr. Akeza Teame founder), Anania (women & children/IVF \u2014 Dr. Tsige Hailu), Sante (dialysis/urology \u2014 Dr. Getnet Bekele), Addis Hiwot (70+ specialists/hematology), Kadisco (surgery/urology/dentistry).\n\nBe warm, clear, concise. Simple language. Never claim to diagnose. If symptoms suggest an emergency (chest pain, stroke signs, severe bleeding, breathing difficulty, loss of consciousness) say so first and tell the patient to go to the nearest emergency room. Always end with: \u26a0\ufe0f This is general information only. Always consult a licensed physician.";
+const BASE_PROMPT = "You are a compassionate medical triage assistant for MediGuide Ethiopia \u2014 Addis Ababa's specialized hospital directory. Help patients find the right care warmly and clearly.\n\nRespond with:\n1. Brief empathetic acknowledgment (1-2 sentences)\n2. Most likely specialty/subspecialty needed\n3. Top 2-3 hospitals from our directory with specific reasons\n4. 1-2 named physicians at those hospitals\n5. Urgency: Emergency (ER now) / Urgent (24-48h) / Routine (schedule appointment)\n6. 2-3 practical self-care steps appropriate to urgency\n7. Disclaimer\n\nOur 19 hospitals in Addis Ababa:\nPUBLIC: Tikur Anbessa (all specialties, ONLY radiotherapy in Ethiopia \u2014 Prof. Yewondwossen Tegene cardiology, Prof. Abebe Bekele oncology), Yekatit 12 (burns/speech therapy \u2014 Dr. Elias Tewabe), Menelik II (large public/dialysis), St Paul's (cardiac surgery \u2014 Dr. Hailu Merga, OB/GYN \u2014 Prof. Tamiru Desta), ALERT (plastic surgery \u2014 Dr. Dawit Bekele, leprosy/HIV), Amanuel (ONLY psychiatric hospital \u2014 Prof. Atalay Alem), Hamlin Fistula (FREE fistula repair, 93% success), St Peter (TB/thoracic national referral).\nPRIVATE: Addis Cardiac (ONLY heart hospital \u2014 Dr. Fasil Tekle interventional, Dr. Tewodros Yohannes cardiac surgery), MCM Korean Hospital (largest private \u2014 Dr. Roger Holland surgery dean, Dr. Jikssa gastro), Bethzatha (oncology/spine), Ethio Tebib (interventional cardiology/gastro/nephrology \u2014 Dr. Melkam Alemu gastro), Hayat (neurosurgery \u2014 Dr. Belay Abebe, gastro), St Gabriel (24/7 first private), AMC (waterbirth/travel medicine \u2014 Dr. Akeza Teame founder), Anania (women & children/IVF \u2014 Dr. Tsige Hailu), Sante (dialysis/urology \u2014 Dr. Getnet Bekele), Addis Hiwot (70+ specialists/hematology), Kadisco (surgery/urology/dentistry).\n\nBe warm, clear, concise. Simple language. Never claim to diagnose. If symptoms suggest an emergency (chest pain, stroke signs, severe bleeding, breathing difficulty, loss of consciousness) say so first and tell the patient to go to the nearest emergency room. Always end with: \u26a0\ufe0f This is general information only. Always consult a licensed physician.";
+
+
+// ── Auto-updated directory entries ───────────────────────────────────────
+// The weekly GitHub Action (after the developer merges its PR) adds facilities and
+// specialists to /data/hospitals-extra.json. We read the deployed copy so the AI
+// recommends them too. Cached 10 min; on any failure we silently use the base prompt.
+const extra = { at: 0, lines: "", n: 0 };
+
+async function buildSystemPrompt(req) {
+  if (Date.now() - extra.at > 10 * 60 * 1000) {
+    extra.at = Date.now();
+    try {
+      const r = await fetch(new URL("/data/hospitals-extra.json", req.url), { signal: AbortSignal.timeout(3000) });
+      const data = r.ok ? await r.json() : {};
+      const hs = (data.hospitals || []).map((h) =>
+        `${h.name} (${h.type}; ${(h.specs || []).map((s) => s.n).join(", ")}${h.phone ? "; " + h.phone : ""})`);
+      const ds = (data.doctorAdditions || []).map((d) => `${d.name} — ${d.specialty} at ${d.hospital}`);
+      extra.n = hs.length;
+      extra.lines = [...hs, ...ds].join("; ").slice(0, 5000);
+    } catch {
+      extra.n = 0;
+      extra.lines = "";
+    }
+  }
+  let p = BASE_PROMPT.replace("Our 19 hospitals in Addis Ababa:", `Our ${19 + extra.n} hospitals in Addis Ababa:`);
+  if (extra.lines) p = p.replace("\n\nBe warm, clear,", `\nRECENTLY ADDED (web-verified): ${extra.lines}\n\nBe warm, clear,`);
+  return p;
+}
 
 const MODEL = process.env.GEMINI_MODEL || "gemini-flash-latest";
 
@@ -32,7 +60,7 @@ export default async (req) => {
   if (!symptoms) return json(400, { error: "Please describe your symptoms." });
   if (symptoms.length > 1500) return json(400, { error: "Description too long (max 1500 characters)." });
 
-  const config = { systemInstruction: SYSTEM_PROMPT, temperature: 0.4, maxOutputTokens: 4096 };
+  const config = { systemInstruction: await buildSystemPrompt(req), temperature: 0.4, maxOutputTokens: 4096 };
   // Gemini 2.5 Flash "thinking" would use up the output budget; switch it off.
   if (/2\.5-flash/.test(MODEL)) {
     config.maxOutputTokens = 1200;
